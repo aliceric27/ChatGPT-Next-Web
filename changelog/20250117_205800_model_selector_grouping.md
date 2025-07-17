@@ -59,6 +59,14 @@ The Model Selector Grouping feature enables users to:
 - Preserved model display formatting and provider information
 - Kept `grouped={true}` property to enable grouping feature
 
+### 5. Unified API Integration (`app/client/platforms/unified.ts`) [NEW]
+- Added robust provider detection from API responses with `createProviderFromOwnedBy` method
+- Implemented intelligent mapping of 'owned_by' fields to provider names and types
+- Added support for major providers: OpenAI, Anthropic, Google, Meta, Mistral, Cohere
+- Enhanced model grouping with provider information from unified API endpoints
+- Improved error handling and logging for better debugging
+- Ensured compatibility with model selector grouping feature
+
 ## Usage Instructions
 
 1. Open any chat conversation
@@ -75,6 +83,7 @@ The Model Selector Grouping feature enables users to:
 - Uses provider.providerName for group names (e.g., "OpenAI", "Anthropic", "Google")
 - Groups are sorted by provider.sorted values for consistent ordering
 - Fallback to "Other Models" group for models without provider information
+- Integration with Unified API to properly group models from third-party endpoints
 
 ### Component Architecture
 - `GroupedSelector` extends the original `Selector` functionality
@@ -125,3 +134,4 @@ The Model Selector Grouping feature enables users to:
 - **Better Organization**: Models are grouped by their actual provider (OpenAI, Anthropic, etc.) rather than name patterns
 - **Enhanced Sorting**: Groups are ordered by provider.sorted values ensuring consistent display order
 - **Backward Compatible**: Maintains the same UI and user experience while improving the underlying logic
+- **Unified API Support**: Added integration with unified API endpoints to properly detect and group models from third-party services

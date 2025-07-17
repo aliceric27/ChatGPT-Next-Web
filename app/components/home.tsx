@@ -15,6 +15,7 @@ import { Path, SlotID } from "../constant";
 import { ErrorBoundary } from "./error";
 
 import { getISOLang, getLang } from "../locales";
+import { ClientApi, getClientApi } from "../client/api";
 
 import {
   HashRouter as Router,
@@ -22,12 +23,11 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
+import { useAccessStore } from "../store";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
 import { AuthPage } from "./auth";
 import { getClientConfig } from "../config/client";
-import { type ClientApi, getClientApi } from "../client/api";
-import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
 
@@ -222,8 +222,11 @@ function Screen() {
 
 export function useLoadData() {
   const config = useAppConfig();
+  const accessStore = useAccessStore();
 
-  const api: ClientApi = getClientApi(config.modelConfig.providerName);
+  const api: ClientApi = accessStore.useUnifiedAPI
+    ? new ClientApi() // This will automatically use UnifiedApi when useUnifiedAPI is true
+    : getClientApi(config.modelConfig.providerName);
 
   useEffect(() => {
     (async () => {
@@ -231,7 +234,7 @@ export function useLoadData() {
       config.mergeModels(models);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [accessStore.useUnifiedAPI]); // Add dependency to re-run when unified API setting changes
 }
 
 export function Home() {
