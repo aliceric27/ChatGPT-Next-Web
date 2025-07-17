@@ -94,6 +94,7 @@ import {
   ListItem,
   Modal,
   Selector,
+  GroupedSelector,
   showConfirm,
   showPrompt,
   showToast,
@@ -680,7 +681,7 @@ export function ChatActions(props: {
         />
 
         {showModelSelector && (
-          <Selector
+          <GroupedSelector
             defaultSelectedValue={`${currentModel}@${currentProviderName}`}
             items={models.map((m) => ({
               title: `${m.displayName}${
@@ -690,6 +691,8 @@ export function ChatActions(props: {
               }`,
               value: `${m.name}@${m?.provider?.providerName}`,
             }))}
+            grouped={true}
+            defaultExpandedGroups={["GPT Models", "Claude Models"]}
             onClose={() => setShowModelSelector(false)}
             onSelection={(s) => {
               if (s.length === 0) return;
