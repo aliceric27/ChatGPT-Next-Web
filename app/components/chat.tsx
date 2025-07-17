@@ -690,9 +690,10 @@ export function ChatActions(props: {
                   : ""
               }`,
               value: `${m.name}@${m?.provider?.providerName}`,
+              provider: m?.provider,
             }))}
             grouped={true}
-            defaultExpandedGroups={["GPT Models", "Claude Models"]}
+            defaultExpandedGroups={["OpenAI", "Anthropic"]}
             onClose={() => setShowModelSelector(false)}
             onSelection={(s) => {
               if (s.length === 0) return;

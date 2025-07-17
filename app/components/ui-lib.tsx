@@ -26,8 +26,9 @@ import { IconButton } from "./button";
 import { Avatar } from "./emoji";
 import clsx from "clsx";
 import {
-  groupItemsByModelPrefix,
+  groupItemsByProvider,
   getGroupDisplayOrder,
+  ModelWithProvider,
 } from "../utils/model-grouping";
 
 export function Popover(props: {
@@ -558,12 +559,7 @@ export function Selector<T>(props: {
 }
 
 export function GroupedSelector<T>(props: {
-  items: Array<{
-    title: string;
-    subTitle?: string;
-    value: T;
-    disable?: boolean;
-  }>;
+  items: Array<ModelWithProvider>;
   defaultSelectedValue?: T[] | T;
   onSelection?: (selection: T[]) => void;
   onClose?: () => void;
@@ -612,8 +608,8 @@ export function GroupedSelector<T>(props: {
     return <Selector {...props} />;
   }
 
-  const groupedItems = groupItemsByModelPrefix(props.items);
-  const groupOrder = getGroupDisplayOrder();
+  const groupedItems = groupItemsByProvider(props.items);
+  const groupOrder = getGroupDisplayOrder(props.items);
 
   return (
     <div className={styles["selector"]} onClick={() => props.onClose?.()}>

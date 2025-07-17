@@ -7,49 +7,35 @@ export interface GroupedItems<T> {
   }>;
 }
 
-export interface ModelGroup {
-  name: string;
-  prefix: string;
-  displayName: string;
+export interface ProviderInfo {
+  id: string;
+  providerName: string;
+  providerType: string;
+  sorted: number;
 }
 
-const MODEL_GROUPS: ModelGroup[] = [
-  { name: "gpt", prefix: "gpt-", displayName: "GPT Models" },
-  { name: "claude", prefix: "claude-", displayName: "Claude Models" },
-  { name: "gemini", prefix: "gemini-", displayName: "Gemini Models" },
-  { name: "deepseek", prefix: "deepseek-", displayName: "DeepSeek Models" },
-  { name: "llama", prefix: "llama-", displayName: "Llama Models" },
-  { name: "qwen", prefix: "qwen-", displayName: "Qwen Models" },
-  { name: "yi", prefix: "yi-", displayName: "Yi Models" },
-];
+export interface ModelWithProvider {
+  title: string;
+  subTitle?: string;
+  value: any;
+  disable?: boolean;
+  provider?: ProviderInfo;
+}
 
-export function groupItemsByModelPrefix<T>(
-  items: Array<{
-    title: string;
-    subTitle?: string;
-    value: T;
-    disable?: boolean;
-  }>,
+export function groupItemsByProvider<T>(
+  items: Array<ModelWithProvider>,
 ): GroupedItems<T> {
   const grouped: GroupedItems<T> = {};
-  const other: typeof items = [];
+  const other: Array<ModelWithProvider> = [];
 
   items.forEach((item) => {
-    const modelName = (item.value as string).toLowerCase();
-    let assigned = false;
-
-    for (const group of MODEL_GROUPS) {
-      if (modelName.startsWith(group.prefix)) {
-        if (!grouped[group.displayName]) {
-          grouped[group.displayName] = [];
-        }
-        grouped[group.displayName].push(item);
-        assigned = true;
-        break;
+    if (item.provider && item.provider.providerName) {
+      const groupName = item.provider.providerName;
+      if (!grouped[groupName]) {
+        grouped[groupName] = [];
       }
-    }
-
-    if (!assigned) {
+      grouped[groupName].push(item);
+    } else {
       other.push(item);
     }
   });
@@ -61,6 +47,22 @@ export function groupItemsByModelPrefix<T>(
   return grouped;
 }
 
-export function getGroupDisplayOrder(): string[] {
-  return [...MODEL_GROUPS.map((g) => g.displayName), "Other Models"];
+export function getGroupDisplayOrder(
+  items: Array<ModelWithProvider>,
+): string[] {
+  // Extract unique providers from items and sort by their sorted property
+  const providerMap = new Map<string, number>();
+
+  items.forEach((item) => {
+    if (item.provider && item.provider.providerName) {
+      providerMap.set(item.provider.providerName, item.provider.sorted);
+    }
+  });
+
+  // Sort providers by their sorted property
+  const sortedProviders = Array.from(providerMap.entries())
+    .sort((a, b) => a[1] - b[1])
+    .map(([providerName]) => providerName);
+
+  return [...sortedProviders, "Other Models"];
 }
