@@ -554,6 +554,26 @@ const en: LocaleType = {
           SubTitle: "Example: ",
         },
       },
+      UnifiedAPI: {
+        Enable: {
+          Title: "Use Unified API",
+          SubTitle:
+            "Force all models to use a single API endpoint with unified authentication",
+        },
+        Endpoint: {
+          Title: "Unified API Endpoint",
+          SubTitle: "All AI requests will be sent to this endpoint",
+        },
+        ApiKey: {
+          Title: "Unified API Key",
+          SubTitle: "API key for unified endpoint authentication",
+          Placeholder: "Enter your unified API key",
+        },
+        Format: {
+          Title: "API Format",
+          SubTitle: "Select the API format that your unified endpoint uses",
+        },
+      },
     },
 
     Model: "Model",

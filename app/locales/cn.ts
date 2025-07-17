@@ -549,6 +549,25 @@ const cn = {
           SubTitle: "样例：",
         },
       },
+      UnifiedAPI: {
+        Enable: {
+          Title: "使用统一 API",
+          SubTitle: "强制所有模型使用单一 API 端点和统一认证",
+        },
+        Endpoint: {
+          Title: "统一 API 端点",
+          SubTitle: "所有 AI 请求都将发送到此端点",
+        },
+        ApiKey: {
+          Title: "统一 API 密钥",
+          SubTitle: "用于统一端点认证的 API 密钥",
+          Placeholder: "请输入统一 API 密钥",
+        },
+        Format: {
+          Title: "API 格式",
+          SubTitle: "选择统一端点使用的 API 格式",
+        },
+      },
     },
 
     Model: "模型 (model)",

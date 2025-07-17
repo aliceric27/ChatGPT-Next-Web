@@ -85,6 +85,29 @@ export class ChatGPTApi implements LLMApi {
   path(path: string): string {
     const accessStore = useAccessStore.getState();
 
+    // Check if unified API is enabled
+    if (
+      accessStore.useUnifiedAPI &&
+      accessStore.unifiedApiFormat === "openai"
+    ) {
+      let baseUrl = accessStore.unifiedBaseUrl;
+
+      if (!baseUrl) {
+        throw new Error("Unified API base URL is not configured");
+      }
+
+      if (baseUrl.endsWith("/")) {
+        baseUrl = baseUrl.slice(0, -1);
+      }
+
+      if (!baseUrl.startsWith("http")) {
+        baseUrl = "https://" + baseUrl;
+      }
+
+      console.log("[Unified API Endpoint] ", baseUrl, path);
+      return cloudflareAIGatewayUrl([baseUrl, path].join("/"));
+    }
+
     let baseUrl = "";
 
     const isAzure = path.includes("deployments");
