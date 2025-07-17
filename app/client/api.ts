@@ -25,6 +25,7 @@ import { XAIApi } from "./platforms/xai";
 import { ChatGLMApi } from "./platforms/glm";
 import { SiliconflowApi } from "./platforms/siliconflow";
 import { Ai302Api } from "./platforms/ai302";
+import { UnifiedApi } from "./platforms/unified";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
@@ -137,6 +138,14 @@ export class ClientApi {
   public llm: LLMApi;
 
   constructor(provider: ModelProvider = ModelProvider.GPT) {
+    const accessStore = useAccessStore.getState();
+
+    // Check if unified API is enabled
+    if (accessStore.useUnifiedAPI) {
+      this.llm = new UnifiedApi();
+      return;
+    }
+
     switch (provider) {
       case ModelProvider.GeminiPro:
         this.llm = new GeminiProApi();
@@ -271,7 +280,12 @@ export function getHeaders(ignoreHeaders: boolean = false) {
       modelConfig.providerName === ServiceProvider.SiliconFlow;
     const isAI302 = modelConfig.providerName === ServiceProvider["302.AI"];
     const isEnabledAccessControl = accessStore.enabledAccessControl();
-    const apiKey = isGoogle
+
+    // Check if unified API is enabled
+    const useUnifiedAPI = accessStore.useUnifiedAPI;
+    const apiKey = useUnifiedAPI
+      ? accessStore.unifiedApiKey
+      : isGoogle
       ? accessStore.googleApiKey
       : isAzure
       ? accessStore.azureApiKey
@@ -314,10 +328,19 @@ export function getHeaders(ignoreHeaders: boolean = false) {
       isAI302,
       apiKey,
       isEnabledAccessControl,
+      useUnifiedAPI,
     };
   }
 
   function getAuthHeader(): string {
+    // For unified API, use the format's auth header
+    if (accessStore.useUnifiedAPI) {
+      const format = accessStore.unifiedApiFormat;
+      if (format === "azure") return "api-key";
+      if (format === "anthropic") return "x-api-key";
+      return "Authorization";
+    }
+
     return isAzure
       ? "api-key"
       : isAnthropic

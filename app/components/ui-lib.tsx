@@ -25,6 +25,11 @@ import React, {
 import { IconButton } from "./button";
 import { Avatar } from "./emoji";
 import clsx from "clsx";
+import {
+  groupItemsByProvider,
+  getGroupDisplayOrder,
+  ModelWithProvider,
+} from "../utils/model-grouping";
 
 export function Popover(props: {
   children: JSX.Element;
@@ -552,6 +557,138 @@ export function Selector<T>(props: {
     </div>
   );
 }
+
+export function GroupedSelector<T>(props: {
+  items: Array<ModelWithProvider>;
+  defaultSelectedValue?: T[] | T;
+  onSelection?: (selection: T[]) => void;
+  onClose?: () => void;
+  multiple?: boolean;
+  grouped?: boolean;
+  defaultExpandedGroups?: string[];
+}) {
+  const [selectedValues, setSelectedValues] = useState<T[]>(
+    Array.isArray(props.defaultSelectedValue)
+      ? props.defaultSelectedValue
+      : props.defaultSelectedValue !== undefined
+      ? [props.defaultSelectedValue]
+      : [],
+  );
+
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
+    new Set(props.defaultExpandedGroups || []),
+  );
+
+  const handleSelection = (e: MouseEvent, value: T) => {
+    if (props.multiple) {
+      e.stopPropagation();
+      const newSelectedValues = selectedValues.includes(value)
+        ? selectedValues.filter((v) => v !== value)
+        : [...selectedValues, value];
+      setSelectedValues(newSelectedValues);
+      props.onSelection?.(newSelectedValues);
+    } else {
+      setSelectedValues([value]);
+      props.onSelection?.([value]);
+      props.onClose?.();
+    }
+  };
+
+  const toggleGroup = (groupName: string) => {
+    const newExpanded = new Set(expandedGroups);
+    if (newExpanded.has(groupName)) {
+      newExpanded.delete(groupName);
+    } else {
+      newExpanded.add(groupName);
+    }
+    setExpandedGroups(newExpanded);
+  };
+
+  if (!props.grouped) {
+    return <Selector {...props} />;
+  }
+
+  const groupedItems = groupItemsByProvider(props.items);
+  const groupOrder = getGroupDisplayOrder(props.items);
+
+  return (
+    <div className={styles["selector"]} onClick={() => props.onClose?.()}>
+      <div className={styles["selector-content"]}>
+        <List>
+          {groupOrder.map((groupName) => {
+            const groupItems = groupedItems[groupName];
+            if (!groupItems || groupItems.length === 0) return null;
+
+            const isExpanded = expandedGroups.has(groupName);
+
+            return (
+              <div key={groupName}>
+                <div
+                  className={styles["selector-group-header"]}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleGroup(groupName);
+                  }}
+                >
+                  <div className={styles["selector-group-title"]}>
+                    <DownIcon
+                      className={clsx(styles["selector-group-icon"], {
+                        [styles["selector-group-icon-expanded"]]: isExpanded,
+                      })}
+                    />
+                    <span>{groupName}</span>
+                  </div>
+                  <span className={styles["selector-group-count"]}>
+                    {groupItems.length}
+                  </span>
+                </div>
+                {isExpanded && (
+                  <div className={styles["selector-group-content"]}>
+                    {groupItems.map((item, i) => {
+                      const selected = selectedValues.includes(item.value);
+                      return (
+                        <ListItem
+                          className={clsx(styles["selector-item"], {
+                            [styles["selector-item-disabled"]]: item.disable,
+                          })}
+                          key={`${groupName}-${i}`}
+                          title={item.title}
+                          subTitle={item.subTitle}
+                          icon={<Avatar model={item.value as string} />}
+                          onClick={(e) => {
+                            if (item.disable) {
+                              e.stopPropagation();
+                            } else {
+                              handleSelection(e, item.value);
+                            }
+                          }}
+                        >
+                          {selected ? (
+                            <div
+                              style={{
+                                height: 10,
+                                width: 10,
+                                backgroundColor: "var(--primary)",
+                                borderRadius: 10,
+                              }}
+                            ></div>
+                          ) : (
+                            <></>
+                          )}
+                        </ListItem>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </List>
+      </div>
+    </div>
+  );
+}
+
 export function FullScreen(props: any) {
   const { children, right = 10, top = 10, ...rest } = props;
   const ref = useRef<HTMLDivElement>();

@@ -139,6 +139,12 @@ const DEFAULT_ACCESS_STATE = {
   ai302Url: DEFAULT_AI302_URL,
   ai302ApiKey: "",
 
+  // unified api config
+  useUnifiedAPI: false,
+  unifiedBaseUrl: "",
+  unifiedApiKey: "",
+  unifiedApiFormat: "openai" as "openai" | "anthropic" | "azure",
+
   // server config
   needCode: true,
   hideUserApiKey: false,
@@ -224,6 +230,10 @@ export const useAccessStore = createPersistStore(
 
     isValidSiliconFlow() {
       return ensure(get(), ["siliconflowApiKey"]);
+    },
+
+    isValidUnifiedAPI() {
+      return ensure(get(), ["unifiedApiKey", "unifiedBaseUrl"]);
     },
 
     isAuthorized() {

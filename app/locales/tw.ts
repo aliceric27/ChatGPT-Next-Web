@@ -393,6 +393,25 @@ const tw = {
           SubTitle: "範例：",
         },
       },
+      UnifiedAPI: {
+        Enable: {
+          Title: "使用統一 API",
+          SubTitle: "強制所有模型使用單一 API 端點和統一認證",
+        },
+        Endpoint: {
+          Title: "統一 API 端點",
+          SubTitle: "所有 AI 請求都將發送到此端點",
+        },
+        ApiKey: {
+          Title: "統一 API 金鑰",
+          SubTitle: "用於統一端點認證的 API 金鑰",
+          Placeholder: "請輸入統一 API 金鑰",
+        },
+        Format: {
+          Title: "API 格式",
+          SubTitle: "選擇統一端點使用的 API 格式",
+        },
+      },
       CustomModel: {
         Title: "自訂模型名稱",
         SubTitle: "增加自訂模型可選擇項目，使用英文逗號隔開",
