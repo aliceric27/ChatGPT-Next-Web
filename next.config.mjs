@@ -94,7 +94,7 @@ if (mode !== "export") {
       },
       {
         source: "/sharegpt",
-        destination: "https://sharegpt.com/api/conversations",
+        destination: "https://share-gpt.cncent454518.workers.dev",
       },
       {
         source: "/api/proxy/alibaba/:path*",
