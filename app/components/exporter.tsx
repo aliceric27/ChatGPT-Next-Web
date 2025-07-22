@@ -260,9 +260,13 @@ export function RenderExport(props: {
   onRender: (messages: ChatMessage[]) => void;
 }) {
   const domRef = useRef<HTMLDivElement>(null);
+  const hasRendered = useRef(false);
 
   useEffect(() => {
+    // 防止重複API調用
+    if (hasRendered.current) return;
     if (!domRef.current) return;
+
     const dom = domRef.current;
     const messages = Array.from(
       dom.getElementsByClassName(EXPORT_MESSAGE_CLASS_NAME),
@@ -282,6 +286,7 @@ export function RenderExport(props: {
       };
     });
 
+    hasRendered.current = true;
     props.onRender(renderMsgs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
