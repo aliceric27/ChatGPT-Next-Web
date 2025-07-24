@@ -277,6 +277,43 @@
     transform: translateY(-50%);
     pointer-events: none;
   }
+
+  // 手機版響應式設計 Mobile responsive design
+  @media screen and (max-width: 600px) {
+    max-width: 100%;
+    width: 100%;
+
+    .select-with-icon-select {
+      width: 100%;
+      min-height: 44px; // 確保足夠的觸控區域
+      font-size: 14px;
+      padding: 8px 35px 8px 10px;
+      text-align: left; // 手機版改為左對齊
+      
+      // 確保 option 文字在手機版上可見
+      option {
+        background-color: var(--white);
+        color: var(--black);
+        padding: 8px;
+        font-size: 14px;
+      }
+      
+      // 確保 optgroup 標籤在手機版上可見
+      optgroup {
+        background-color: var(--second);
+        color: var(--black);
+        font-weight: bold;
+        font-size: 13px;
+        padding: 4px;
+      }
+    }
+
+    .select-with-icon-icon {
+      width: 16px;
+      height: 16px;
+      right: 12px;
+    }
+  }
 }
 
 .modal-input {

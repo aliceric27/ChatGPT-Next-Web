@@ -1,8 +1,59 @@
+.model-select-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  
+  // 手機版響應式設計 Mobile responsive design
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+.model-select {
+  flex: 1;
+  
+  // 手機版響應式設計 Mobile responsive design
+  @media screen and (max-width: 600px) {
+    flex: none;
+    width: 100%;
+    
+    .select-with-icon-select {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+}
+
+.model-settings-button {
+  min-width: 40px;
+  
+  // 手機版響應式設計 Mobile responsive design
+  @media screen and (max-width: 600px) {
+    width: 100%;
+    min-width: 44px; // 確保足夠的觸控區域
+    justify-content: center;
+  }
+}
+
 .select-compress-model {
   width: 60%;
   select {
     max-width: 100%;
     white-space: normal;
+  }
+
+  // 手機版響應式設計 Mobile responsive design  
+  @media screen and (max-width: 600px) {
+    width: 100%;
+    
+    select {
+      font-size: 14px;
+      padding: 8px;
+      min-height: 40px; // 確保足夠的觸控區域
+    }
   }
 }
 

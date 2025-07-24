@@ -223,16 +223,9 @@ export function ModelConfigList(props: {
         </div>
       )}
       <ListItem title={Locale.Settings.Model}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            width: "100%",
-          }}
-        >
+        <div className={styles["model-select-container"]}>
           <Select
-            style={{ flex: 1 }}
+            className={styles["model-select"]}
             aria-label={Locale.Settings.Model}
             value={value}
             align="left"
@@ -260,11 +253,11 @@ export function ModelConfigList(props: {
             ))}
           </Select>
           <IconButton
+            className={styles["model-settings-button"]}
             icon={<SettingsIcon />}
             onClick={() => setShowModelSelect(!showModelSelect)}
             title={Locale.Settings.EnableModels || "啟用模型"}
             bordered
-            style={{ minWidth: "40px" }}
           />
         </div>
       </ListItem>
