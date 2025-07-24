@@ -119,4 +119,4 @@ proxy-config.json
 
 # Lock files (keeping yarn.lock for consistency)
 package-lock.json
-.claude/
+.claude
