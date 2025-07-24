@@ -419,6 +419,7 @@ const tw = {
     },
 
     Model: "模型 (model)",
+    EnableModels: "啟用模型",
     CompressModel: {
       Title: "壓縮模型",
       SubTitle: "用於壓縮歷史記錄的模型",

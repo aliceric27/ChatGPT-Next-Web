@@ -39,8 +39,7 @@ export enum Theme {
 const config = getClientConfig();
 
 export const DEFAULT_CONFIG = {
-  lastUpdate: Date.now(), // timestamp, to merge state
-
+  lastUpdate: Date.now(),
   submitKey: SubmitKey.Enter,
   avatar: "1f603",
   fontSize: 14,
@@ -50,18 +49,14 @@ export const DEFAULT_CONFIG = {
   sendPreviewBubble: true,
   enableAutoGenerateTitle: true,
   sidebarWidth: DEFAULT_SIDEBAR_WIDTH,
-
-  enableArtifacts: true, // show artifacts config
-
-  enableCodeFold: true, // code fold config
-
+  enableArtifacts: true,
+  enableCodeFold: true,
   disablePromptHint: false,
-
-  dontShowMaskSplashScreen: false, // dont show splash screen when create chat
-  hideBuiltinMasks: false, // dont add builtin masks
-
+  dontShowMaskSplashScreen: false,
+  hideBuiltinMasks: false,
   customModels: "",
   models: DEFAULT_MODELS as any as LLMModel[],
+  enabledModels: [] as string[],
 
   modelConfig: {
     model: "gpt-4o-mini" as ModelType,
@@ -186,16 +181,15 @@ export const useAppConfig = createPersistStore(
         modelMap[`${model.name}@${model?.provider?.id}`] = model;
       }
 
-      set(() => ({
-        models: Object.values(modelMap),
-      }));
+      set(() => ({ models: Object.values(modelMap) }));
     },
-
-    allModels() {},
+    updateEnabledModels(models: string[]) {
+      set(() => ({ enabledModels: models }));
+    },
   }),
   {
     name: StoreKey.Config,
-    version: 4.1,
+    version: 4.2,
 
     merge(persistedState, currentState) {
       const state = persistedState as ChatConfig | undefined;
@@ -253,6 +247,10 @@ export const useAppConfig = createPersistStore(
           DEFAULT_CONFIG.modelConfig.compressModel;
         state.modelConfig.compressProviderName =
           DEFAULT_CONFIG.modelConfig.compressProviderName;
+      }
+
+      if (version < 4.2) {
+        state.enabledModels = [];
       }
 
       return state as any;

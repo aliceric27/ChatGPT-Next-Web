@@ -571,6 +571,7 @@ const cn = {
     },
 
     Model: "模型 (model)",
+    EnableModels: "启用模型",
     CompressModel: {
       Title: "对话摘要模型",
       SubTitle: "用于压缩历史记录、生成对话标题的模型",

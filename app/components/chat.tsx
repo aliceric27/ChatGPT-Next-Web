@@ -116,7 +116,7 @@ import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
 import { prettyObject } from "../utils/format";
 import { ExportMessageModal } from "./exporter";
 import { getClientConfig } from "../config/client";
-import { useAllModels } from "../utils/hooks";
+import { useFilteredModels } from "../utils/hooks";
 import { ClientApi, MultimodalContent } from "../client/api";
 import { createTTSPlayer } from "../utils/audio";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
@@ -505,21 +505,21 @@ export function ChatActions(props: {
   setUserInput: (input: string) => void;
   setShowChatSidePanel: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const config = useAppConfig();
+  const appConfig = useAppConfig();
   const navigate = useNavigate();
   const chatStore = useChatStore();
   const pluginStore = usePluginStore();
   const session = chatStore.currentSession();
 
   // switch themes
-  const theme = config.theme;
+  const theme = appConfig.theme;
 
   function nextTheme() {
     const themes = [Theme.Auto, Theme.Light, Theme.Dark];
     const themeIndex = themes.indexOf(theme);
     const nextIndex = (themeIndex + 1) % themes.length;
     const nextTheme = themes[nextIndex];
-    config.update((config) => (config.theme = nextTheme));
+    appConfig.update((config) => (config.theme = nextTheme));
   }
 
   // stop all responses
@@ -530,21 +530,22 @@ export function ChatActions(props: {
   const currentModel = session.mask.modelConfig.model;
   const currentProviderName =
     session.mask.modelConfig?.providerName || ServiceProvider.OpenAI;
-  const allModels = useAllModels();
+  const { filteredModels } = useFilteredModels();
+
   const models = useMemo(() => {
-    const filteredModels = allModels.filter((m) => m.available);
-    const defaultModel = filteredModels.find((m) => m.isDefault);
+    const availableModels = filteredModels.filter((m) => m.available);
+    const defaultModel = availableModels.find((m) => m.isDefault);
 
     if (defaultModel) {
       const arr = [
         defaultModel,
-        ...filteredModels.filter((m) => m !== defaultModel),
+        ...availableModels.filter((m) => m !== defaultModel),
       ];
       return arr;
     } else {
-      return filteredModels;
+      return availableModels;
     }
-  }, [allModels]);
+  }, [filteredModels]);
   const currentModelName = useMemo(() => {
     const model = models.find(
       (m) =>
@@ -839,7 +840,7 @@ export function ChatActions(props: {
         {!isMobileScreen && <MCPAction />}
       </>
       <div className={styles["chat-input-actions-end"]}>
-        {config.realtimeConfig.enable && (
+        {appConfig.realtimeConfig.enable && (
           <ChatAction
             onClick={() => props.setShowChatSidePanel(true)}
             text={"Realtime Chat"}
