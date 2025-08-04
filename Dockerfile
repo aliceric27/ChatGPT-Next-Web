@@ -1,5 +1,8 @@
 FROM node:18-alpine AS base
 
+# Add security updates
+RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
+
 FROM base AS deps
 
 RUN apk add --no-cache libc6-compat
@@ -15,8 +18,6 @@ FROM base AS builder
 
 RUN apk update && apk add --no-cache git
 
-ENV OPENAI_API_KEY=""
-ENV GOOGLE_API_KEY=""
 ENV CODE=""
 
 WORKDIR /app
@@ -28,7 +29,11 @@ RUN yarn build
 FROM base AS runner
 WORKDIR /app
 
-RUN apk add proxychains-ng
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
+# Install proxychains-ng with minimal privileges
+RUN apk add --no-cache proxychains-ng && rm -rf /var/cache/apk/*
 
 ENV PROXY_URL=""
 ENV OPENAI_API_KEY=""
@@ -41,28 +46,21 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/server ./.next/server
 
-RUN mkdir -p /app/app/mcp && chmod 777 /app/app/mcp
+# Create MCP directory with appropriate permissions
+RUN mkdir -p /app/app/mcp && chown -R nodejs:nodejs /app/app/mcp && chmod 755 /app/app/mcp
 COPY --from=builder /app/app/mcp/mcp_config.default.json /app/app/mcp/mcp_config.json
+
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Change ownership of all files to nodejs user
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
 
 EXPOSE 3000
 
-CMD if [ -n "$PROXY_URL" ]; then \
-    export HOSTNAME="0.0.0.0"; \
-    protocol=$(echo $PROXY_URL | cut -d: -f1); \
-    host=$(echo $PROXY_URL | cut -d/ -f3 | cut -d: -f1); \
-    port=$(echo $PROXY_URL | cut -d: -f3); \
-    conf=/etc/proxychains.conf; \
-    echo "strict_chain" > $conf; \
-    echo "proxy_dns" >> $conf; \
-    echo "remote_dns_subnet 224" >> $conf; \
-    echo "tcp_read_time_out 15000" >> $conf; \
-    echo "tcp_connect_time_out 8000" >> $conf; \
-    echo "localnet 127.0.0.0/255.0.0.0" >> $conf; \
-    echo "localnet ::1/128" >> $conf; \
-    echo "[ProxyList]" >> $conf; \
-    echo "$protocol $host $port" >> $conf; \
-    cat /etc/proxychains.conf; \
-    proxychains -f $conf node server.js; \
-    else \
-    node server.js; \
-    fi
+# Use JSON format CMD for better security
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

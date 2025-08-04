@@ -28,7 +28,6 @@ import clsx from "clsx";
 import {
   groupItemsByProvider,
   getGroupDisplayOrder,
-  ModelWithProvider,
 } from "../utils/model-grouping";
 
 export function Popover(props: {
@@ -559,7 +558,13 @@ export function Selector<T>(props: {
 }
 
 export function GroupedSelector<T>(props: {
-  items: Array<ModelWithProvider>;
+  items: Array<{
+    title: string;
+    subTitle?: string;
+    value: T;
+    disable?: boolean;
+    provider?: any;
+  }>;
   defaultSelectedValue?: T[] | T;
   onSelection?: (selection: T[]) => void;
   onClose?: () => void;
@@ -645,7 +650,7 @@ export function GroupedSelector<T>(props: {
                 {isExpanded && (
                   <div className={styles["selector-group-content"]}>
                     {groupItems.map((item, i) => {
-                      const selected = selectedValues.includes(item.value);
+                      const selected = selectedValues.includes(item.value as T);
                       return (
                         <ListItem
                           className={clsx(styles["selector-item"], {
@@ -659,7 +664,7 @@ export function GroupedSelector<T>(props: {
                             if (item.disable) {
                               e.stopPropagation();
                             } else {
-                              handleSelection(e, item.value);
+                              handleSelection(e, item.value as T);
                             }
                           }}
                         >

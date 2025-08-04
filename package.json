@@ -58,6 +58,10 @@
     "zod": "^3.24.1",
     "zustand": "^4.3.8"
   },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.8",
+    "utf-8-validate": "^6.0.3"
+  },
   "devDependencies": {
     "@tauri-apps/api": "^2.1.1",
     "@tauri-apps/cli": "1.5.11",
